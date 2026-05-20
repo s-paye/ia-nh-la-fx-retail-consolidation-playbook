@@ -1,0 +1,2469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retail Consolidation Playbook — IA / LA / NH</title>
+<style>
+  :root {
+    --dk-green: #1a9c3e;
+    --dk-dark: #0f1923;
+    --dk-mid: #1e2d3d;
+    --dk-border: #2e4057;
+    --dk-text: #e8edf2;
+    --dk-muted: #8a9bb0;
+    --dk-yellow: #f5c518;
+    --dk-red: #e63946;
+    --dk-orange: #f4833d;
+    --dk-blue: #4a9eff;
+    --dk-teal: #00c2cb;
+    --radius: 6px;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--dk-dark);
+    color: var(--dk-text);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  /* ── Layout ── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 240px;
+    height: 100vh;
+    background: var(--dk-mid);
+    border-right: 1px solid var(--dk-border);
+    overflow-y: auto;
+    padding: 20px 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 0 20px 16px;
+    border-bottom: 1px solid var(--dk-border);
+    margin-bottom: 12px;
+  }
+
+  .sidebar-logo .logo-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dk-green);
+  }
+
+  .sidebar-logo h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dk-text);
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  .sidebar nav a {
+    display: block;
+    padding: 7px 20px;
+    color: var(--dk-muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  .sidebar nav a:hover {
+    color: var(--dk-text);
+    background: rgba(255,255,255,0.04);
+    border-left-color: var(--dk-green);
+  }
+
+  .sidebar nav .nav-section {
+    padding: 14px 20px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--dk-border);
+  }
+
+  .main {
+    margin-left: 240px;
+    padding: 40px 48px;
+    max-width: 1100px;
+  }
+
+  /* ── Header ── */
+  .page-header {
+    border-bottom: 1px solid var(--dk-border);
+    padding-bottom: 28px;
+    margin-bottom: 36px;
+  }
+
+  .page-header .badge-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-green  { background: rgba(26,156,62,0.2);  color: var(--dk-green); }
+  .badge-blue   { background: rgba(74,158,255,0.15); color: var(--dk-blue); }
+  .badge-orange { background: rgba(244,131,61,0.2);  color: var(--dk-orange); }
+  .badge-teal   { background: rgba(0,194,203,0.15);  color: var(--dk-teal); }
+
+  /* ── Timeline button ── */
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .header-top h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .timeline-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    background: rgba(74,158,255,0.12);
+    border: 1px solid rgba(74,158,255,0.35);
+    border-radius: var(--radius);
+    color: var(--dk-blue);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .timeline-btn:hover {
+    background: rgba(74,158,255,0.2);
+    border-color: var(--dk-blue);
+    color: #fff;
+  }
+
+  .timeline-btn svg { flex-shrink: 0; }
+
+  /* ── Timeline modal ── */
+  .tl-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,16,23,0.85);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .tl-overlay.open { display: flex; }
+
+  .tl-modal {
+    background: var(--dk-mid);
+    border: 1px solid var(--dk-border);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 820px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  }
+
+  .tl-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--dk-border);
+    position: sticky;
+    top: 0;
+    background: var(--dk-mid);
+    z-index: 10;
+  }
+
+  .tl-modal-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .tl-modal-header .tl-close {
+    background: none;
+    border: none;
+    color: var(--dk-muted);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+
+  .tl-modal-header .tl-close:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+  .tl-modal-body { padding: 24px; }
+
+  .tl-track {
+    position: relative;
+    padding-left: 32px;
+  }
+
+  .tl-track::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--dk-border);
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 8px;
+  }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -26px;
+    top: 14px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--dk-border);
+    background: var(--dk-dark);
+    transition: all 0.15s;
+  }
+
+  .tl-item.status-done::before    { background: var(--dk-green);  border-color: var(--dk-green); }
+  .tl-item.status-active::before  { background: var(--dk-blue);   border-color: var(--dk-blue);  box-shadow: 0 0 0 3px rgba(74,158,255,0.25); }
+  .tl-item.status-blocked::before { background: var(--dk-red);    border-color: var(--dk-red); }
+  .tl-item.status-open::before    { background: var(--dk-dark);   border-color: var(--dk-muted); }
+
+  .tl-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 110px 90px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    border: 1px solid var(--dk-border);
+    border-radius: var(--radius);
+    background: rgba(15,25,35,0.5);
+    margin-bottom: 2px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  .tl-row:hover { background: rgba(74,158,255,0.05); }
+
+  .tl-phase-tag {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--dk-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .tl-milestone {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .tl-milestone .tl-sub {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--dk-muted);
+    margin-top: 1px;
+  }
+
+  .tl-owner {
+    font-size: 11px;
+    color: var(--dk-muted);
+    text-align: right;
+  }
+
+  .tl-status-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-align: center;
+  }
+
+  .pill-open       { background: rgba(138,155,176,0.15); color: var(--dk-muted); }
+  .pill-active     { background: rgba(74,158,255,0.18);  color: var(--dk-blue);  }
+  .pill-inprogress { background: rgba(74,158,255,0.18);  color: var(--dk-blue);  }
+  .pill-done       { background: rgba(26,156,62,0.18);   color: var(--dk-green); }
+  .pill-blocked    { background: rgba(230,57,70,0.18);   color: var(--dk-red);   }
+  .pill-critical   { background: rgba(244,131,61,0.15);  color: var(--dk-orange);}
+
+  .tl-month-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--dk-teal);
+    margin: 20px 0 8px;
+    padding-left: 0;
+  }
+
+  .tl-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--dk-border);
+  }
+
+  .tl-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--dk-muted);
+  }
+
+  .tl-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .page-header .subtitle {
+    margin-top: 6px;
+    color: var(--dk-muted);
+    font-size: 13.5px;
+  }
+
+  .page-header .role-callout {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(26,156,62,0.1);
+    border-left: 3px solid var(--dk-green);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: #b8dfc4;
+    font-size: 13px;
+  }
+
+  /* ── Sections ── */
+  .section {
+    margin-bottom: 48px;
+    scroll-margin-top: 24px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--dk-border);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--dk-green);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  th {
+    background: var(--dk-mid);
+    color: var(--dk-muted);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 9px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--dk-border);
+  }
+
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(46,64,87,0.5);
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .table-wrap {
+    border: 1px solid var(--dk-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+
+  /* ── Risk badges in table ── */
+  .risk-high    { color: var(--dk-red);    font-weight: 600; }
+  .risk-medium  { color: var(--dk-orange); font-weight: 600; }
+  .risk-low     { color: var(--dk-muted);  font-weight: 600; }
+  .risk-critical{ color: #ff6b6b;          font-weight: 700; }
+
+  /* ── Phase cards ── */
+  .phase-card {
+    border: 1px solid var(--dk-border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--dk-mid);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .phase-header:hover { background: rgba(46,64,87,0.8); }
+
+  .phase-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dk-muted);
+    background: rgba(255,255,255,0.06);
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  .phase-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #fff;
+    flex: 1;
+  }
+
+  .phase-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .tag-critical { background: rgba(230,57,70,0.2); color: var(--dk-red); }
+  .tag-parallel { background: rgba(74,158,255,0.15); color: var(--dk-blue); }
+  .tag-separate { background: rgba(245,197,24,0.15); color: var(--dk-yellow); }
+
+  .phase-chevron {
+    color: var(--dk-muted);
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+
+  .phase-card.open .phase-chevron { transform: rotate(180deg); }
+
+  .phase-body {
+    display: none;
+    padding: 16px;
+    border-top: 1px solid var(--dk-border);
+  }
+
+  .phase-card.open .phase-body { display: block; }
+
+  /* ── Checklists ── */
+  .checklist { list-style: none; }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(46,64,87,0.3);
+    font-size: 13px;
+    color: var(--dk-text);
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .checklist li input[type="checkbox"] {
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: var(--dk-green);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+
+  .checklist li.checked label {
+    text-decoration: line-through;
+    color: var(--dk-muted);
+  }
+
+  .checklist li label { cursor: pointer; line-height: 1.5; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    margin: 12px 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .callout-warning {
+    background: rgba(230,57,70,0.1);
+    border-left: 3px solid var(--dk-red);
+    color: #f2b8bb;
+  }
+
+  .callout-info {
+    background: rgba(74,158,255,0.1);
+    border-left: 3px solid var(--dk-blue);
+    color: #b3d4ff;
+  }
+
+  .callout-tip {
+    background: rgba(0,194,203,0.1);
+    border-left: 3px solid var(--dk-teal);
+    color: #b3eef0;
+  }
+
+  .callout strong { color: #fff; }
+
+  /* ── Cutover run-of-show ── */
+  .run-of-show { list-style: none; }
+
+  .run-of-show li {
+    display: grid;
+    grid-template-columns: 36px 1fr 100px 60px;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(46,64,87,0.4);
+    font-size: 13px;
+  }
+
+  .run-of-show li:last-child { border-bottom: none; }
+  .run-of-show li:hover { background: rgba(255,255,255,0.02); }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(26,156,62,0.15);
+    border: 1px solid rgba(26,156,62,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dk-green);
+    flex-shrink: 0;
+  }
+
+  .step-owner {
+    font-size: 11px;
+    color: var(--dk-muted);
+    background: rgba(255,255,255,0.05);
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ── Rollback ── */
+  .rollback-list { list-style: none; counter-reset: rb; }
+
+  .rollback-list li {
+    counter-increment: rb;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(46,64,87,0.3);
+    font-size: 13px;
+  }
+
+  .rollback-list li:last-child { border-bottom: none; }
+
+  .rollback-list li::before {
+    content: counter(rb);
+    width: 22px;
+    height: 22px;
+    background: rgba(230,57,70,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dk-red);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Anti-patterns ── */
+  .antipattern-list { list-style: none; counter-reset: ap; }
+
+  .antipattern-list li {
+    counter-increment: ap;
+    padding: 12px 14px 12px 44px;
+    position: relative;
+    border: 1px solid var(--dk-border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .antipattern-list li::before {
+    content: counter(ap);
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    width: 22px;
+    height: 22px;
+    background: rgba(244,131,61,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dk-orange);
+  }
+
+  .antipattern-list li strong { color: var(--dk-orange); }
+
+  /* ── Comms cadence ── */
+  .comms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .comms-card {
+    border: 1px solid var(--dk-border);
+    border-radius: var(--radius);
+    padding: 14px;
+    background: rgba(30,45,61,0.5);
+  }
+
+  .comms-card .comms-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .comms-card .comms-meta {
+    font-size: 11px;
+    color: var(--dk-muted);
+    margin-bottom: 8px;
+  }
+
+  .comms-card .comms-content {
+    font-size: 12px;
+    color: var(--dk-text);
+    line-height: 1.5;
+  }
+
+  /* ── Jira ticket links ── */
+  .jira-tickets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .jira-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--dk-mid);
+    border: 1px solid var(--dk-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--dk-blue);
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+
+  .jira-link:hover {
+    background: rgba(74,158,255,0.1);
+    border-color: var(--dk-blue);
+  }
+
+  .jira-link .jira-owner {
+    color: var(--dk-muted);
+    font-weight: 400;
+  }
+
+  /* ── Subsection headings ── */
+  h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--dk-teal);
+    margin: 18px 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 11px;
+  }
+
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin: 14px 0 8px;
+  }
+
+  p { margin-bottom: 10px; color: var(--dk-text); font-size: 13px; }
+
+  strong { color: #fff; }
+
+  /* ── Progress summary bar ── */
+  .progress-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--dk-mid);
+    border: 1px solid var(--dk-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-card .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card .stat-label {
+    font-size: 11px;
+    color: var(--dk-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-card.green .stat-num { color: var(--dk-green); }
+  .stat-card.red .stat-num   { color: var(--dk-red); }
+  .stat-card.blue .stat-num  { color: var(--dk-blue); }
+  .stat-card.orange .stat-num{ color: var(--dk-orange); }
+
+  /* ── Scope creep alert strip ── */
+  .scope-strip {
+    background: rgba(230,57,70,0.08);
+    border: 1px solid rgba(230,57,70,0.3);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 20px;
+  }
+
+  .scope-strip .strip-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--dk-red);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .scope-strip ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .scope-strip ul li {
+    font-size: 12px;
+    background: rgba(230,57,70,0.1);
+    border: 1px solid rgba(230,57,70,0.2);
+    border-radius: 4px;
+    padding: 3px 10px;
+    color: #f2b8bb;
+  }
+
+  /* ── Ticket Board ── */
+  .tb-filters {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--dk-border);
+  }
+
+  .tb-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--dk-border);
+    background: transparent;
+    color: var(--dk-muted);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tb-filter:hover { background: rgba(255,255,255,0.04); color: var(--dk-text); }
+
+  .tb-filter.active {
+    background: rgba(74,158,255,0.15);
+    border-color: rgba(74,158,255,0.4);
+    color: var(--dk-blue);
+  }
+
+  .tb-filter-warn { color: var(--dk-orange); border-color: rgba(244,131,61,0.3); }
+  .tb-filter-warn.active { background: rgba(244,131,61,0.12); border-color: var(--dk-orange); color: var(--dk-orange); }
+
+  .tb-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .tb-jql-link {
+    font-size: 11px;
+    color: var(--dk-muted);
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--dk-border);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .tb-jql-link:hover { color: var(--dk-blue); border-color: rgba(74,158,255,0.4); background: rgba(74,158,255,0.06); }
+
+  .tb-group {
+    margin-bottom: 24px;
+  }
+
+  .tb-group-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--dk-border);
+  }
+
+  .tb-group-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--dk-teal);
+  }
+
+  .tb-group-meta {
+    font-size: 11px;
+    color: var(--dk-muted);
+  }
+
+  .tb-group-meta code {
+    font-size: 10px;
+    background: rgba(255,255,255,0.06);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--dk-muted);
+  }
+
+  .tb-card {
+    border: 1px solid var(--dk-border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background: rgba(15,25,35,0.4);
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .tb-card:hover { border-color: rgba(74,158,255,0.3); background: rgba(74,158,255,0.03); }
+
+  .tb-card.tb-hidden { display: none; }
+
+  .tb-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tb-key {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--dk-blue);
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+
+  .tb-key:hover { text-decoration: underline; }
+
+  .tb-status-pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  .tb-assignee {
+    font-size: 11px;
+    color: var(--dk-muted);
+    margin-left: auto;
+  }
+
+  .tb-unassigned { color: var(--dk-orange); font-weight: 600; }
+
+  .tb-summary {
+    font-size: 13px;
+    color: var(--dk-text);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .tb-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .tb-label-chip {
+    font-size: 10px;
+    padding: 2px 7px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--dk-border);
+    border-radius: 3px;
+    color: var(--dk-muted);
+    letter-spacing: 0.2px;
+  }
+
+  .tb-type {
+    font-size: 10px;
+    color: var(--dk-muted);
+    margin-left: auto;
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  .tb-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    border: 1px dashed var(--dk-border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+  }
+
+  .tb-empty-state code {
+    background: rgba(255,255,255,0.06);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 24px 20px; }
+    .progress-summary { grid-template-columns: repeat(2, 1fr); }
+    .run-of-show li { grid-template-columns: 36px 1fr; }
+    .run-of-show li .step-owner,
+    .run-of-show li input { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-tag">INFRAENG</div>
+    <h2>Retail Consolidation<br>Playbook</h2>
+  </div>
+  <nav>
+    <div class="nav-section">Overview</div>
+    <a href="#charter">Project Charter</a>
+    <a href="#stakeholders">Stakeholder Map</a>
+    <div class="nav-section">Execution</div>
+    <a href="#phases">Phase 0 — Kickoff</a>
+    <a href="#phase1">Phase 1 — Infra</a>
+    <a href="#phase2">Phase 2 — DB + Core</a>
+    <a href="#phase3">Phase 3 — PaaS</a>
+    <a href="#phase4">Phase 4 — BI</a>
+    <a href="#phase5">Phase 5 — Retail Eng</a>
+    <a href="#phase6">Phase 6 — Release Mgmt</a>
+    <a href="#phase7">Phase 7 — Cutover</a>
+    <a href="#phase8">Phase 8 — Post-Cutover</a>
+    <a href="#phase9">Phase 9 — SFTP</a>
+    <a href="#phase10">Phase 10 — Decommission</a>
+    <a href="#phase11">Phase 11 — Closure</a>
+    <div class="nav-section">Reference</div>
+    <a href="#raid">RAID Log</a>
+    <a href="#deliverables">Deliverables</a>
+    <a href="#epics">Infra Epic Map</a>
+    <a href="#antipatterns">Anti-Patterns</a>
+    <a href="#comms">Comms Cadence</a>
+    <a href="#tickets">Ticket Board</a>
+  </nav>
+</nav>
+
+<!-- ── Main ── -->
+<main class="main">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="badge-row">
+      <span class="badge badge-green">Iowa (IA)</span>
+      <span class="badge badge-blue">Louisiana (LA)</span>
+      <span class="badge badge-orange">New Hampshire (NH)</span>
+      <span class="badge badge-teal">Foxwoods — Separate Track</span>
+    </div>
+    <div class="header-top">
+      <h1>Retail Consolidation Playbook</h1>
+      <button class="timeline-btn" onclick="openTimeline()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="3" width="14" height="2" rx="1" fill="currentColor" opacity="0.4"/>
+          <rect x="1" y="7" width="9" height="2" rx="1" fill="currentColor" opacity="0.7"/>
+          <rect x="1" y="11" width="12" height="2" rx="1" fill="currentColor"/>
+          <circle cx="13" cy="8" r="2.5" fill="currentColor"/>
+        </svg>
+        View Timeline
+      </button>
+    </div>
+    <p class="subtitle">DC Rebuild + Retail Consolidation &nbsp;|&nbsp; Lead: Saydu Paye &nbsp;|&nbsp; Infra start: June 2026</p>
+    <div class="role-callout">
+      <strong>Your role:</strong> Infrastructure lead. You own the infra sequencing, are the primary stakeholder interface, and are responsible for keeping the project ahead of blockers — not reacting to them.
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="progress-summary">
+    <div class="stat-card blue">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Jurisdictions</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-num">11</div>
+      <div class="stat-label">Phases</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-num">16</div>
+      <div class="stat-label">Child Epics Tracked</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Epics Not Started ⚠️</div>
+    </div>
+  </div>
+
+  <!-- Scope creep alert -->
+  <div class="scope-strip">
+    <div class="strip-title">Scope Creep Watchpoints</div>
+    <ul>
+      <li>Endpoint change → reg review</li>
+      <li>IP whitelisting → Net Ops + reg notify</li>
+      <li>SFTP → separate workstream, not Day 1</li>
+      <li>RE scope expansion → PM approval required</li>
+      <li>Foxwoods → never on IA/LA/NH critical path</li>
+      <li>6 Backlog epics (Kilo + DBI) → must start before Phase 2</li>
+      <li>IA + NH infra sagas past due → verify with Eric Beisecker</li>
+    </ul>
+  </div>
+
+  <!-- 1. Project Charter -->
+  <section class="section" id="charter">
+    <h2 class="section-title"><span class="section-num">1</span> Project Charter</h2>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Field</th><th>Detail</th></tr>
+        <tr><td><strong>In scope</strong></td><td>Iowa (IA), Louisiana (LA), New Hampshire (NH) — plus <strong>Foxwoods</strong> (separate track, iGaming/tribal)</td></tr>
+        <tr><td><strong>Driver</strong></td><td>EOL hardware, security/patching gaps, stability risk, cost optimization</td></tr>
+        <tr><td><strong>Architecture</strong></td><td>Shared hardware / virtualization layer; <strong>separate OSB and Retail clusters</strong> (due to existing retail dependencies)</td></tr>
+        <tr><td><strong>Infra start</strong></td><td><strong>June 2026</strong> (~1–1.5 sprints, assuming proper planning and resourcing)</td></tr>
+        <tr><td><strong>Physical scope</strong></td><td><strong>No physical site moves</strong> — workloads remain within existing data centers</td></tr>
+        <tr><td><strong>OSB impact</strong></td><td>No major OSB impact expected outside of planned maintenance-window cutovers</td></tr>
+        <tr><td><strong>Compliance base</strong></td><td>Existing NJ/Michigan documentation reused and updated per jurisdiction</td></tr>
+        <tr><td><strong>Your accountability</strong></td><td>Timeline, RAID log, milestone tracking, Go/No-Go, Release Mgmt coordination</td></tr>
+        <tr><td><strong>Critical path</strong></td><td><span class="risk-critical">Retail Engineering</span> — engage first, confirm scope &amp; capacity before anything else</td></tr>
+      </table>
+    </div>
+
+    <h3>Key People</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Name</th><th>Role</th><th>Email</th></tr>
+        <tr><td><strong>Saydu Paye</strong></td><td>Lead — regulatory + tribal engagement (IA/LA/NH + Foxwoods)</td><td>s.paye@draftkings.com</td></tr>
+        <tr><td>Andrii Protsenko</td><td>Retail epic/workstream coordination</td><td>a.protsenko@draftkings.com</td></tr>
+        <tr><td>LaDarius Owens</td><td>Retail epic coordination + regulatory/tribal (Foxwoods PM)</td><td>l.owens@draftkings.com</td></tr>
+        <tr><td>Mike Emler</td><td>Compliance/regulatory documentation</td><td>m.emler@draftkings.com</td></tr>
+        <tr><td><strong>Eric Beisecker</strong></td><td>Infra lead/assignee — all 4 sagas (IA, LA, NH, Foxwoods)</td><td>TBD</td></tr>
+        <tr><td>Infra Leadership</td><td>Cutover sequencing + timeline confirmation</td><td>TBD</td></tr>
+      </table>
+    </div>
+
+    <div class="callout callout-warning">
+      <strong>Foxwoods — Separate Track.</strong> Foxwoods is <em>not</em> part of the IA/LA/NH consolidation. Runs as a parallel independent workstream due to iGaming and tribal compliance. PM: LaDarius Owens. Infra lead: Eric Beisecker. Child epics: INFRAENG-1213 (DBI, Backlog, due Jun 21), INFRAENG-7543 (NetOps, In Progress), INFRAENG-8100 (CT02NX100-PE cluster, In Progress), INFRAENG-12638 (Kilo, Backlog). Do not let Foxwoods dependencies block the IA/LA/NH cutover.
+    </div>
+  </section>
+
+  <!-- 2. Stakeholder Map -->
+  <section class="section" id="stakeholders">
+    <h2 class="section-title"><span class="section-num">2</span> Stakeholder Map</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Team</th><th>What they need from you</th><th>What you need from them</th><th>Scope-creep risk</th></tr>
+        <tr><td>PM</td><td>Status updates, RAID log, milestone hits</td><td>Business objective, cutover date</td><td><span class="risk-low">Low</span></td></tr>
+        <tr><td>DC Ops</td><td>Ticket + timeline</td><td>Capacity confirmation, hardware readiness</td><td><span class="risk-low">Low</span></td></tr>
+        <tr><td>Net Ops</td><td>Firewall/routing requirements, timeline</td><td>Connectivity validation sign-off</td><td><span class="risk-medium">Medium</span> — can block infra</td></tr>
+        <tr><td>Core Infra</td><td>Provisioning request, architecture diagram</td><td>Environment readiness sign-off</td><td><span class="risk-low">Low</span></td></tr>
+        <tr><td>DB Ops</td><td>DB provisioning request</td><td>Infra validation, migration plan</td><td><span class="risk-medium">Medium</span> — SYSDBA dependency</td></tr>
+        <tr><td>SYSDBA</td><td>Migration plan hand-off</td><td>DB access/perf validation, rollback plan</td><td><span class="risk-high">High</span> — migration is complex</td></tr>
+        <tr><td>PaaS</td><td>App dependency list (Kafka, Vault, k8s)</td><td>Services deployed + secrets configured</td><td><span class="risk-high">High</span> — endpoint changes trigger reg review</td></tr>
+        <tr><td>BI</td><td>Source/target data endpoints</td><td>Reporting validation sign-off</td><td><span class="risk-low">Low</span></td></tr>
+        <tr><td><strong>Retail Engineering</strong></td><td>Full app scope EARLY, config changes needed</td><td>Testing complete, cutover sign-off</td><td><span class="risk-critical">CRITICAL</span> — most common scope expansion</td></tr>
+        <tr><td>Release Management</td><td>RCM ticket, cutover plan, testing evidence</td><td>Maintenance window, CAB/reg approval</td><td><span class="risk-high">High</span> — approval timelines vary by jurisdiction</td></tr>
+        <tr><td>Regulatory/Compliance</td><td>Arch diagram, endpoint changes, hosting changes</td><td>Approval per jurisdiction (IA/LA/NH differ)</td><td><span class="risk-high">High</span> — slowest approval cycle</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 3. Phases -->
+  <section class="section" id="phases">
+    <h2 class="section-title"><span class="section-num">3</span> Execution Phases</h2>
+
+    <!-- Phase 0 -->
+    <div class="phase-card open" id="phase0">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 0</span>
+        <span class="phase-title">Project Kickoff — Do these first</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <p style="color:var(--dk-muted); font-size:12px; margin-bottom:12px;">Your personal checklist — complete in the first week before any infra work begins.</p>
+        <ul class="checklist" id="cl-0">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm business objective with PM in writing (email/Jira comment)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Document source and target environments for IA, LA, NH</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm regulatory path for each jurisdiction — IA, LA, NH have different approval timelines</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label><strong>Engage Retail Engineering immediately</strong> — get scope defined before infra work starts</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label><strong>Engage Release Management immediately</strong> — do not wait until cutover is near</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Identify and book maintenance window (align with other planned downtime if possible)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Create project tracking: Jira epic + Airtable board</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Establish RAID log (Risks, Assumptions, Issues, Decisions)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get architecture diagrams assigned or drafted</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Select cutover date with business awareness (avoid high-traffic events, regulatory blackout windows)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Create Slack channel for project comms and add all team leads</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 1 -->
+    <div class="phase-card" id="phase1">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 1</span>
+        <span class="phase-title">Infrastructure Readiness — DC Ops + Net Ops + Kilo + DBI</span>
+        <span class="phase-tag tag-parallel">PARALLEL</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="callout callout-warning"><strong>Gate:</strong> Phase 1 cannot close until the infra sagas below are complete enough to host workloads. IA (INFRAENG-6912) and NH (INFRAENG-6909) are <strong>already past due</strong> as of May 2026. Get revised completion dates from Eric Beisecker before committing to a cutover date. <strong>6 of 12 child epics are sitting in Backlog with no assignee</strong> — all Kilo rebuilds and all DBI rebuilds across IA/LA/NH have not started.</div>
+
+        <h4>Active Infra Epics — Track Weekly</h4>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Epic</th><th>Jurisdiction</th><th>Summary</th><th>Team</th><th>Status</th></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8135" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8135</a></td><td>IA</td><td>Cluster Deployment: IA01NX100-PE (OSB/Retail)</td><td>Kilo</td><td><span class="tl-status-pill pill-active">In Progress</span> <span style="font-size:10px;color:var(--dk-orange)">NOW</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8287" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8287</a></td><td>IA</td><td>IADC02 — Iowa Rebuild (NetOps)</td><td>NetOps</td><td><span class="tl-status-pill pill-active">In Progress</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9187" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-9187</a></td><td>IA</td><td>IADC02 — Iowa Rebuild (Kilo)</td><td>Kilo</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9091" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-9091</a></td><td>IA</td><td>IA Rebuilds (DBI)</td><td>DBI</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8150" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8150</a></td><td>LA</td><td>Cluster Deployment: LA01NX100-PE (OSB/Retail)</td><td>Kilo</td><td><span class="tl-status-pill pill-active">In Progress</span> <span style="font-size:10px;color:var(--dk-orange)">NOW</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8311" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8311</a></td><td>LA</td><td>LADC02 — Louisiana Rebuild (NetOps)</td><td>NetOps</td><td><span class="tl-status-pill pill-active">In Progress</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9189" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-9189</a></td><td>LA</td><td>LADC02 — Rebuild (Kilo)</td><td>Kilo</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-10082" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-10082</a></td><td>LA</td><td>LA DC Rebuilds (DBI)</td><td>DBI</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8142" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8142</a></td><td>NH</td><td>Cluster Deployment: NH01NX100-PE (OSB/Retail)</td><td>Kilo</td><td><span class="tl-status-pill pill-active">In Progress</span> <span style="font-size:10px;color:var(--dk-orange)">NOW</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8299" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8299</a></td><td>NH</td><td>NHDC02 — New Hampshire Rebuild (NetOps)</td><td>NetOps</td><td><span class="tl-status-pill pill-active">In Progress</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9188" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-9188</a></td><td>NH</td><td>NHDC02 — Rebuild (Kilo)</td><td>Kilo</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+            <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-10081" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-10081</a></td><td>NH</td><td>NH DC Rebuilds (DBI)</td><td>DBI</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><strong>Cross-cutting gap:</strong> All 6 Backlog epics (Kilo + DBI for IA/LA/NH) follow the same pattern — not started, no assignee. Raise with Eric Beisecker as a single cross-cutting issue, not four separate ones. Require start date commitment by end of May.</div>
+
+        <h4>DC Ops</h4>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm IADC02, LADC02, NHDC02 capacity and rack assignment with DC Ops (target Nutanix cluster environments)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm physical hardware readiness per jurisdiction</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get written sign-off: DC Ops complete</label></li>
+        </ul>
+        <h4>Net Ops</h4>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Reference INFRAENG-8287 (IA), INFRAENG-8311 (LA), INFRAENG-8299 (NH) for rebuild network work already in flight</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Provide Net Ops with firewall rules, routing, and traffic paths for retail workload cutover (separate from Nutanix rebuild scope)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm any IP changes → flag to regulatory if applicable</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Validate connectivity from new environment before Phase 2 starts</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get written sign-off: Net Ops complete</label></li>
+        </ul>
+        <h4>Kilo / Core Infra</h4>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm INFRAENG-9187 (IA), INFRAENG-9189 (LA), INFRAENG-9188 (NH) Kilo epics have a start date — currently Backlog ⚠️</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Kilo rebuild completion is a hard prerequisite for retail workload hosting — cluster deployment alone is not sufficient</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get written sign-off: Kilo / Core Infra complete</label></li>
+        </ul>
+        <h4>DBI (Database Infrastructure)</h4>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm INFRAENG-9091 (IA), INFRAENG-10082 (LA), INFRAENG-10081 (NH) DBI epics have a start date — currently Backlog ⚠️</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>DBI readiness is a prerequisite for Phase 2 DB Ops provisioning — do not let Phase 2 start before DBI epics are in progress</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get written sign-off: DBI complete</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase-card" id="phase2">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 2</span>
+        <span class="phase-title">Core Infra + DB Ops Provisioning</span>
+        <span class="phase-tag tag-parallel">PARALLEL</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <h4>Core Infra</h4>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Submit provisioning request with architecture diagram attached</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Define compute spec per jurisdiction (IA, LA, NH may differ)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Validate environment readiness (access, connectivity, health checks)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get written sign-off: Core Infra complete</label></li>
+        </ul>
+        <h4>DB Ops + SYSDBA</h4>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Submit DB provisioning request</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm SYSDBA has migration plan in draft</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Validate DB access, performance baseline, and replication/mirroring setup</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm rollback approach documented before migration begins</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get written sign-off: DB Ops + SYSDBA complete</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase-card" id="phase3">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 3</span>
+        <span class="phase-title">PaaS Platform Setup</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="callout callout-warning"><strong>Any endpoint change here triggers regulatory review.</strong> Log everything. Don't let PaaS make changes without flagging you first.</div>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Provide PaaS with full list of Kafka topics, Vault secrets, and k8s resources per jurisdiction</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm all endpoint changes are logged — any change triggers regulatory review</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Validate Kafka, Vault, Kubernetes resources are deployed and accessible</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm secrets configured and tested by Retail Engineering</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get written sign-off: PaaS complete</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase-card" id="phase4">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 4</span>
+        <span class="phase-title">BI Validation</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm BI has source and target data endpoints documented</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>BI executes reporting pipeline validation in non-prod</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm data accuracy and pipeline integrity</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get written sign-off: BI complete</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="phase-card" id="phase5">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 5</span>
+        <span class="phase-title">Retail Engineering Development + Testing</span>
+        <span class="phase-tag tag-critical">CRITICAL PATH</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="callout callout-warning"><strong>This is the most likely phase to blow up your timeline.</strong> Watch it closely. RE scope expands silently — build a standing agenda item in every sync: "any new config changes this week?"</div>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>RE has confirmed full application scope (do not proceed without this)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>RE has all configuration changes documented (endpoints, secrets, Kafka topics)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>RE testing executed in non-prod for all three jurisdictions</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>All critical flows validated: bet placement, transactions, event streams</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>All defects resolved or formally acknowledged</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Test evidence provided (logs, screenshots, Jira updates)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Get written sign-off: Retail Eng testing complete</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 6 -->
+    <div class="phase-card" id="phase6">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 6</span>
+        <span class="phase-title">Release Management Readiness</span>
+        <span class="phase-tag tag-critical">CRITICAL PATH</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="callout callout-info"><strong>Regulatory note:</strong> IA, LA, and NH are separate jurisdictions — each has different approval requirements and timelines. Start regulatory engagement in Phase 0, not here. If you wait until Phase 6 you will miss your cutover date.</div>
+        <h4>RCM Ticket Must Include</h4>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Planned release date</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Change level</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Impacted products and jurisdictions (IA, LA, NH each listed separately)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Downtime confirmation (duration, window)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>CAB approval obtained</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Regulatory approval — IA confirmed</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Regulatory approval — LA confirmed</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Regulatory approval — NH confirmed</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>All linked Jira tickets attached</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Rollback plan documented and reviewed</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Cutover plan attached</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Testing plan with evidence attached</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Communication plan attached</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Go/No-Go checklist attached</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 7 -->
+    <div class="phase-card" id="phase7">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 7</span>
+        <span class="phase-title">Cutover Execution</span>
+        <span class="phase-tag tag-critical">CRITICAL PATH</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <h4>Go/No-Go Gate — ALL must be true</h4>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>All testing completed with evidence</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>All teams signed off (DC Ops, Net Ops, Core Infra, DB Ops, SYSDBA, PaaS, BI, RE, RM, Regulatory)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Backup and migration readiness confirmed</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Rollback plan validated and owner named</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>No critical open issues (P1/P2 blockers = No-Go)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>RCM approved</label></li>
+        </ul>
+
+        <h4 style="margin-top:18px;">Run-of-Show</h4>
+        <div style="border:1px solid var(--dk-border); border-radius:var(--radius); overflow:hidden;">
+          <div style="display:grid; grid-template-columns:36px 1fr 120px 50px; gap:10px; padding:8px 12px; background:var(--dk-mid); font-size:11px; font-weight:700; color:var(--dk-muted); text-transform:uppercase; letter-spacing:0.5px;">
+            <span>#</span><span>Action</span><span>Owner</span><span>Done</span>
+          </div>
+          <ul class="run-of-show">
+            <li><span class="step-num">1</span><span>Enable maintenance mode</span><span class="step-owner">RE</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">2</span><span>Enable UM pages</span><span class="step-owner">RE</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">3</span><span>Enable PagerDuty maintenance window</span><span class="step-owner">You / RM</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">4</span><span>Stop retail services</span><span class="step-owner">RE</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">5</span><span>Pause platform dependencies if needed</span><span class="step-owner">PaaS</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">6</span><span>Execute DB migration (dump/restore)</span><span class="step-owner">SYSDBA</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">7</span><span>Validate migration completion</span><span class="step-owner">SYSDBA / DBOps</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">8</span><span>Redirect applications to new environment</span><span class="step-owner">RE</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">9</span><span>Scale down old / scale up new</span><span class="step-owner">Core Infra</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">10</span><span>Post-switch app validation</span><span class="step-owner">RE</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">11</span><span>Validate critical flows (betting, transactions)</span><span class="step-owner">RE</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">12</span><span>Confirm Kafka/event streams</span><span class="step-owner">PaaS</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">13</span><span>Restart applications</span><span class="step-owner">RE</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">14</span><span>Validate onsite (casino/property if required)</span><span class="step-owner">RE / on-site</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">15</span><span>Remove maintenance pages</span><span class="step-owner">RE</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">16</span><span>Disable PagerDuty maintenance</span><span class="step-owner">You / RM</span><input type="checkbox" onchange="markDone(this)"></li>
+            <li><span class="step-num">17</span><span>Send completion communication</span><span class="step-owner">You / RM</span><input type="checkbox" onchange="markDone(this)"></li>
+          </ul>
+        </div>
+
+        <h4 style="margin-top:18px;">Rollback Triggers (non-negotiable)</h4>
+        <div class="callout callout-warning" style="margin-bottom:12px;">
+          DB migration validation fails → immediate rollback<br>
+          Critical flow (bet placement) fails post-switch → immediate rollback<br>
+          Rollback decision must be within the maintenance window — no extensions without CAB<br>
+          Owners: <strong>SYSDBA</strong> (DB) · <strong>RE</strong> (app) · <strong>Core Infra</strong> (env)
+        </div>
+        <h4>Rollback Actions</h4>
+        <ol class="rollback-list">
+          <li>Revert endpoints to original environment (RE)</li>
+          <li>Restart legacy services (RE)</li>
+          <li>Restore DB mirroring/data flow (SYSDBA)</li>
+          <li>Scale down new environment (Core Infra)</li>
+          <li>Remove maintenance mode (RE)</li>
+          <li>Send rollback communication (You)</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Phase 8 -->
+    <div class="phase-card" id="phase8">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 8</span>
+        <span class="phase-title">Post-Cutover Validation</span>
+        <span class="phase-tag tag-critical">CRITICAL PATH</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <p style="color:var(--dk-muted); font-size:12px; margin-bottom:12px;">All must pass before calling cutover complete. Get written confirmation from each team.</p>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>Retail product availability confirmed — IA</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Retail product availability confirmed — LA</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Retail product availability confirmed — NH</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Transaction flows operational (bet placement, payouts)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Application health checks green</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Database connectivity confirmed</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Platform services healthy (Kafka, Vault, k8s)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Network connectivity confirmed</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Reporting pipelines validated by BI</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>No data loss or event disruption confirmed</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 9 -->
+    <div class="phase-card" id="phase9">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 9</span>
+        <span class="phase-title">Follow-up &amp; SFTP</span>
+        <span class="phase-tag tag-separate">SEPARATE WORKSTREAM</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="callout callout-tip"><strong>SFTP is not on the Day 1 critical path.</strong> Do not let anyone add it to the cutover scope. Track it separately.</div>
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>SFTP changes tracked separately in Jira — confirmed not blocking cutover</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>SFTP endpoint changes confirmed with regulatory if applicable</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>IP whitelisting updated</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>User migration and access reset completed</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 10 -->
+    <div class="phase-card" id="phase10">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 10</span>
+        <span class="phase-title">Decommissioning</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>All post-cutover validation passed and confirmed</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>DC Ops ticket: decommission legacy hardware for IA, LA, NH</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Confirm decommission completed and hardware released</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Update architecture diagrams to reflect new state</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Close all RAID log items</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 11 -->
+    <div class="phase-card" id="phase11">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">PHASE 11</span>
+        <span class="phase-title">Closure &amp; Retrospective</span>
+        <span class="phase-chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <ul class="checklist">
+          <li><input type="checkbox" onchange="markDone(this)"><label>System stable for stabilization period (minimum 1 week)</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>All follow-up Jira tickets tracked and assigned</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Decommission confirmed complete</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Retrospective conducted with all teams</label></li>
+          <li><input type="checkbox" onchange="markDone(this)"><label>Lessons learned documented back into Confluence playbook</label></li>
+        </ul>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- 4. RAID Log -->
+  <section class="section" id="raid">
+    <h2 class="section-title"><span class="section-num">4</span> RAID Log</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>ID</th><th>Type</th><th>Description</th><th>Probability</th><th>Impact</th><th>Mitigation</th><th>Owner</th><th>Status</th></tr>
+        <tr>
+          <td>R01</td><td>Risk</td>
+          <td>Retail Eng bandwidth insufficient for 3 concurrent rebuilds</td>
+          <td><span class="risk-high">High</span></td><td><span class="risk-critical">Critical</span></td>
+          <td>Confirm capacity in Phase 0; escalate to PM if &lt;100% allocated</td>
+          <td>You</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr>
+          <td>R02</td><td>Risk</td>
+          <td>Regulatory delays for IA, LA, or NH</td>
+          <td><span class="risk-high">High</span></td><td><span class="risk-high">High</span></td>
+          <td>Engage regulatory in Phase 0; track each jurisdiction separately</td>
+          <td>You / RM</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr>
+          <td>R03</td><td>Risk</td>
+          <td>DB migration failure during cutover window</td>
+          <td><span class="risk-medium">Medium</span></td><td><span class="risk-critical">Critical</span></td>
+          <td>SYSDBA to validate rollback approach before cutover; dry-run if feasible</td>
+          <td>SYSDBA</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr>
+          <td>R04</td><td>Risk</td>
+          <td>Endpoint changes trigger unexpected regulatory review</td>
+          <td><span class="risk-medium">Medium</span></td><td><span class="risk-high">High</span></td>
+          <td>Log all endpoint changes; require regulatory check before finalizing</td>
+          <td>You / Reg</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr>
+          <td>R05</td><td>Risk</td>
+          <td>SFTP changes block cutover</td>
+          <td><span class="risk-medium">Medium</span></td><td><span class="risk-medium">Medium</span></td>
+          <td>Separate workstream; SFTP not on Day 1 critical path</td>
+          <td>You</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr>
+          <td>R06</td><td>Risk</td>
+          <td>Net Ops delays block infra readiness</td>
+          <td><span class="risk-low">Low–Med</span></td><td><span class="risk-high">High</span></td>
+          <td>Engage Net Ops in Phase 1 immediately; validate early</td>
+          <td>Net Ops</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr style="background:rgba(230,57,70,0.06);">
+          <td><strong>R07</strong></td><td>Risk</td>
+          <td><strong>Infra sagas INFRAENG-6912 (IA) and INFRAENG-6909 (NH) already past due as of May 2026</strong> — retail consolidation Phase 1 is gated on these closing</td>
+          <td><span class="risk-critical">Critical</span></td><td><span class="risk-critical">Critical</span></td>
+          <td>Confirm revised completion dates from Eric Beisecker this week; add to weekly sync agenda</td>
+          <td>You / Eric Beisecker</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr style="background:rgba(230,57,70,0.06);">
+          <td><strong>R08</strong></td><td>Risk</td>
+          <td><strong>6 Backlog epics (Kilo + DBI for IA/LA/NH) have not started</strong> — INFRAENG-9187, 9188, 9189, 9091, 10081, 10082 — no assignee, no start date</td>
+          <td><span class="risk-high">High</span></td><td><span class="risk-high">High</span></td>
+          <td>Escalate to Eric Beisecker; require start date commitment by end of May</td>
+          <td>You / Eric Beisecker</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr style="background:rgba(244,131,61,0.05);">
+          <td>R09</td><td>Risk</td>
+          <td>IPS-424 (NH retail workload migration to NHDC02) still in Discovery — RE testing cannot begin until this is in Delivery</td>
+          <td><span class="risk-medium">Medium</span></td><td><span class="risk-high">High</span></td>
+          <td>Track IPS-424 status weekly; flag to RE team that NH target environment may not be ready</td>
+          <td>You / PaaS</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr>
+          <td>A01</td><td>Assumption</td>
+          <td>Each jurisdiction (IA, LA, NH) has independent regulatory approval path</td>
+          <td>—</td><td>—</td>
+          <td>Confirm with Regulatory in Phase 0</td>
+          <td>Regulatory</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr>
+          <td>A02</td><td>Assumption</td>
+          <td>Cutover date aligned with no major betting events</td>
+          <td>—</td><td>—</td>
+          <td>Confirm with business before finalizing</td>
+          <td>PM</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr>
+          <td>A03</td><td>Assumption</td>
+          <td>Cluster deployment epics (8135, 8150, 8142) completing is sufficient for retail hosting — Kilo rebuild epics must also complete before workloads can run</td>
+          <td>—</td><td>—</td>
+          <td>Confirm with Eric Beisecker that Kilo rebuild is prerequisite, not optional</td>
+          <td>You / Eric Beisecker</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr style="background:rgba(230,57,70,0.04);">
+          <td><strong>I01</strong></td><td>Issue</td>
+          <td>DBI rebuild epics for all 3 jurisdictions (INFRAENG-9091 IA, INFRAENG-10081 NH, INFRAENG-10082 LA) are in Backlog with no assignee or start date</td>
+          <td>—</td><td>—</td>
+          <td>Raise with DBI team lead — must be scheduled before Phase 2 DB Ops work begins</td>
+          <td>You</td><td><span class="badge badge-orange">Open</span></td>
+        </tr>
+        <tr>
+          <td>D01</td><td>Decision</td>
+          <td>SFTP treated as separate post-cutover workstream</td>
+          <td>—</td><td>—</td>
+          <td>Agreed in kickoff</td>
+          <td>You</td><td><span class="badge badge-green">Closed</span></td>
+        </tr>
+        <tr>
+          <td>D02</td><td>Decision</td>
+          <td>Eric Beisecker confirmed as infra lead/assignee across all 4 sagas (IA, LA, NH, Foxwoods)</td>
+          <td>—</td><td>—</td>
+          <td>Confirmed via Jira saga scan</td>
+          <td>You</td><td><span class="badge badge-green">Closed</span></td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 5. Deliverables -->
+  <section class="section" id="deliverables">
+    <h2 class="section-title"><span class="section-num">5</span> Deliverables Tracker</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Deliverable</th><th>Owner</th><th>Due</th><th>Status</th></tr>
+        <tr><td>Project plan (Jira epic)</td><td>You</td><td>Phase 0</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>RAID log</td><td>You</td><td>Phase 0</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>Architecture diagrams (IA, LA, NH)</td><td>Core Infra</td><td>Phase 1</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>RCM ticket</td><td>You / RM</td><td>Phase 6</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>Cutover plan</td><td>You</td><td>Phase 6</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>Testing documentation (per jurisdiction)</td><td>RE</td><td>Phase 5</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>Rollback plan</td><td>SYSDBA / RE</td><td>Phase 6</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>Validation checklist (completed)</td><td>All</td><td>Phase 8</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>Status reports</td><td>You</td><td>Weekly</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>Retrospective doc</td><td>You</td><td>Phase 11</td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr style="background:rgba(230,57,70,0.06);"><td><strong>Eric Beisecker revised completion dates for IA + NH infra sagas</strong></td><td>You</td><td><strong>This week</strong></td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr style="background:rgba(230,57,70,0.06);"><td><strong>Start date confirmation — 6 Backlog epics (Kilo + DBI, all jurisdictions)</strong></td><td>You</td><td><strong>End of May</strong></td><td><span class="badge badge-orange">Open</span></td></tr>
+        <tr><td>IPS-424 status confirmation (NH retail workload migration)</td><td>You</td><td>Phase 0</td><td><span class="badge badge-orange">Open</span></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 5a. Infra Epic Reference Map -->
+  <section class="section" id="epics">
+    <h2 class="section-title"><span class="section-num" style="background:var(--dk-blue);">★</span> Infra Epic Reference Map</h2>
+    <p style="color:var(--dk-muted);font-size:13px;margin-bottom:16px;">All epics live under Odyssey INFRAENG-11189 (DC Hardware Replacement Programme). Use this as your weekly health-check. If any of these slip, the retail consolidation timeline moves with it.</p>
+
+    <h4>Iowa — Saga: <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-6912" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-6912</a> &nbsp;<span class="tl-status-pill pill-blocked" style="font-size:11px;">⚠️ Past Due</span></h4>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Epic</th><th>Summary</th><th>Team</th><th>Status</th></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8135" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8135</a></td><td>Cluster Deployment: IA01NX100-PE — OSB/Retail</td><td>Kilo</td><td><span class="tl-status-pill pill-active">In Progress</span> <span style="font-size:10px;color:var(--dk-orange);font-weight:700;">NOW</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8287" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8287</a></td><td>IADC02 — Iowa Rebuild (NetOps)</td><td>NetOps</td><td><span class="tl-status-pill pill-active">In Progress</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9187" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-9187</a></td><td>IADC02 — Iowa Rebuild (Kilo)</td><td>Kilo</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9091" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-9091</a></td><td>IA Rebuilds (DBI)</td><td>DBI</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+      </table>
+    </div>
+
+    <h4>Louisiana — Saga: <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-6918" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-6918</a> &nbsp;<span class="tl-status-pill pill-active" style="font-size:11px;">On Track</span></h4>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Epic</th><th>Summary</th><th>Team</th><th>Status</th></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8150" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8150</a></td><td>Cluster Deployment: LA01NX100-PE — OSB/Retail</td><td>Kilo</td><td><span class="tl-status-pill pill-active">In Progress</span> <span style="font-size:10px;color:var(--dk-orange);font-weight:700;">NOW</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8311" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8311</a></td><td>LADC02 — Louisiana Rebuild (NetOps)</td><td>NetOps</td><td><span class="tl-status-pill pill-active">In Progress</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9189" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-9189</a></td><td>LADC02 — Rebuild (Kilo)</td><td>Kilo</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-10082" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-10082</a></td><td>LA DC Rebuilds (DBI)</td><td>DBI</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+      </table>
+    </div>
+
+    <h4>New Hampshire — Saga: <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-6909" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-6909</a> &nbsp;<span class="tl-status-pill pill-blocked" style="font-size:11px;">⚠️ Past Due</span></h4>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Epic</th><th>Summary</th><th>Team</th><th>Status</th></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8142" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8142</a></td><td>Cluster Deployment: NH01NX100-PE — OSB/Retail</td><td>Kilo</td><td><span class="tl-status-pill pill-active">In Progress</span> <span style="font-size:10px;color:var(--dk-orange);font-weight:700;">NOW</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8299" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8299</a></td><td>NHDC02 — New Hampshire Rebuild (NetOps)</td><td>NetOps</td><td><span class="tl-status-pill pill-active">In Progress</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9188" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-9188</a></td><td>NHDC02 — Rebuild (Kilo)</td><td>Kilo</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-10081" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-10081</a></td><td>NH DC Rebuilds (DBI)</td><td>DBI</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+      </table>
+    </div>
+
+    <h4>Foxwoods (Separate Track) — Saga: <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-519" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-519</a> &nbsp;<span class="tl-status-pill pill-active" style="font-size:11px;">On Track</span> — PM: LaDarius Owens</h4>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Epic</th><th>Summary</th><th>Team</th><th>Status</th></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-1213" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-1213</a></td><td>DBI — FX Rebuild Data Center</td><td>DBI</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span> <span style="font-size:10px;color:var(--dk-red);">Due Jun 21</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-7543" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-7543</a></td><td>FXDC02 — Foxwoods Rebuild (NetOps)</td><td>NetOps</td><td><span class="tl-status-pill pill-active">In Progress</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8100" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-8100</a></td><td>Cluster Deployment: CT02NX100-PE — OSB/Retail</td><td>Kilo</td><td><span class="tl-status-pill pill-active">In Progress</span> <span style="font-size:10px;color:var(--dk-orange);font-weight:700;">NOW</span></td></tr>
+        <tr><td><a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-12638" target="_blank" style="color:var(--dk-blue);text-decoration:none;">INFRAENG-12638</a></td><td>FXDC02 — Rebuild (Kilo)</td><td>Kilo</td><td><span class="tl-status-pill pill-open">Backlog ⚠️</span></td></tr>
+      </table>
+    </div>
+
+    <div class="callout callout-warning"><strong>Cross-cutting pattern:</strong> The same gap exists across all 4 jurisdictions — cluster deployments and NetOps are running, but all Kilo rebuild epics and all DBI rebuild epics are in Backlog. Raise with Eric Beisecker as a single cross-cutting issue. Kilo and DBI completing is a hard prerequisite for retail workloads being hosted on the new infrastructure.</div>
+  </section>
+
+  <!-- 6. Anti-Patterns -->
+  <section class="section" id="antipatterns">
+    <h2 class="section-title"><span class="section-num">6</span> Anti-Patterns / Scope Creep Triggers</h2>
+    <p style="color:var(--dk-muted); margin-bottom:16px; font-size:13px;">The most common ways retail consolidations go sideways. Watch for all of them.</p>
+    <ol class="antipattern-list">
+      <li><strong>RE scope expands after Phase 0</strong> — new apps, services, or topics added mid-project. Each addition resets the testing timeline. Push back hard; require PM approval for any scope change.</li>
+      <li><strong>Endpoint changes made without regulatory flag</strong> — PaaS or RE makes a config change; no one tells you. Standing agenda item every sync: "any endpoint changes this week?"</li>
+      <li><strong>SFTP gets added to Day 1 scope</strong> — SFTP is a separate workstream. It is not on the critical path unless explicitly decided otherwise.</li>
+      <li><strong>Regulatory approval assumed, not confirmed</strong> — IA, LA, NH each have their own compliance timelines. Don't accept "we'll get approval" without a date.</li>
+      <li><strong>Go/No-Go gets pressured by business</strong> — If any criteria is unmet, the answer is No-Go. Document your decision in Jira.</li>
+      <li><strong>Post-cutover validation is skipped or rushed</strong> — All 10 validation items must be explicitly confirmed. Get them in writing.</li>
+      <li><strong>Decommission is deprioritized</strong> — Old hardware left running creates shadow infrastructure. Set a firm decommission date at kickoff.</li>
+    </ol>
+  </section>
+
+  <!-- 7. Comms Cadence -->
+  <section class="section" id="comms">
+    <h2 class="section-title"><span class="section-num">7</span> Stakeholder Communication Cadence</h2>
+    <div class="comms-grid">
+      <div class="comms-card">
+        <div class="comms-title">Weekly Status Update</div>
+        <div class="comms-meta">PM + Stakeholders &nbsp;|&nbsp; Every week</div>
+        <div class="comms-content">RAID summary, milestone status, open blockers</div>
+      </div>
+      <div class="comms-card">
+        <div class="comms-title">Team Sync</div>
+        <div class="comms-meta">All workstream leads &nbsp;|&nbsp; Weekly / bi-weekly</div>
+        <div class="comms-content">Agenda: blockers, scope changes, timeline review</div>
+      </div>
+      <div class="comms-card">
+        <div class="comms-title">Cutover Readiness Briefing</div>
+        <div class="comms-meta">All teams &nbsp;|&nbsp; T-1 week</div>
+        <div class="comms-content">Go/No-Go criteria status per team</div>
+      </div>
+      <div class="comms-card">
+        <div class="comms-title">Pre-Cutover Bridge</div>
+        <div class="comms-meta">All teams &nbsp;|&nbsp; Day of cutover</div>
+        <div class="comms-content">Run-of-show walkthrough, final Go/No-Go</div>
+      </div>
+      <div class="comms-card">
+        <div class="comms-title">Completion Communication</div>
+        <div class="comms-meta">All stakeholders &nbsp;|&nbsp; Post-cutover</div>
+        <div class="comms-content">"Cutover complete, validation status, any follow-ups"</div>
+      </div>
+      <div class="comms-card" style="border-color: rgba(230,57,70,0.3);">
+        <div class="comms-title" style="color:var(--dk-red);">Rollback Communication</div>
+        <div class="comms-meta">All stakeholders &nbsp;|&nbsp; Immediately if needed</div>
+        <div class="comms-content">"Rollback initiated, reason, next steps"</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Jira Tickets -->
+  <section class="section" id="tickets">
+    <h2 class="section-title"><span class="section-num">★</span> Ticket Board</h2>
+
+    <!-- Filter bar -->
+    <div class="tb-filters" id="tbFilters">
+      <button class="tb-filter active" onclick="filterTickets('all', this)">All <span class="tb-count" id="cnt-all">20</span></button>
+      <button class="tb-filter" onclick="filterTickets('backlog', this)">Backlog <span class="tb-count" id="cnt-backlog">12</span></button>
+      <button class="tb-filter" onclick="filterTickets('inprogress', this)">In Progress <span class="tb-count" id="cnt-inprogress">8</span></button>
+      <button class="tb-filter" onclick="filterTickets('done', this)">Done <span class="tb-count" id="cnt-done">0</span></button>
+      <button class="tb-filter tb-filter-warn" onclick="filterTickets('unassigned', this)">Unassigned ⚠️ <span class="tb-count" id="cnt-unassigned">18</span></button>
+      <button class="tb-filter" onclick="filterTickets('phase1', this)">Phase 1 <span class="tb-count" id="cnt-phase1">12</span></button>
+      <button class="tb-filter" onclick="filterTickets('phase2', this)">Phase 2 <span class="tb-count" id="cnt-phase2">4</span></button>
+      <div style="flex:1;"></div>
+      <a href="https://draftkingsofficial.atlassian.net/issues/?jql=project%3DINFRAENG%20AND%20labels%3Dretail-consolidation%20ORDER%20BY%20created%20DESC" target="_blank" class="tb-jql-link">View all in Jira ↗</a>
+    </div>
+
+    <!-- ── Squad: Project Management ── -->
+    <div class="tb-group" data-group="project-management" data-squad="pm">
+      <div class="tb-group-header">
+        <span class="tb-group-label">Project Management</span>
+        <span class="tb-group-meta">4 tickets &nbsp;·&nbsp; label: <code>rc-phase-0</code></span>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase0">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-12015" target="_blank" class="tb-key">INFRAENG-12015</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Confirm final cutover sequencing and timeline (IA / LA / NH)</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-0</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">cutover-sequencing</span>
+          <span class="tb-type">Task</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="assigned" data-phase="phase0">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-12016" target="_blank" class="tb-key">INFRAENG-12016</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee">Mike Emler</span>
+        </div>
+        <div class="tb-summary">Update and distribute compliance / regulatory documentation (IA / LA / NH)</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-0</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">compliance</span>
+          <span class="tb-label-chip">regulatory</span>
+          <span class="tb-type">Task</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase0">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-12017" target="_blank" class="tb-key">INFRAENG-12017</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Begin regulatory + tribal engagement for IA / LA / NH and Foxwoods</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-0</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">regulatory</span>
+          <span class="tb-label-chip">foxwoods</span>
+          <span class="tb-label-chip">tribal</span>
+          <span class="tb-type">Task</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="assigned" data-phase="phase0">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-12018" target="_blank" class="tb-key">INFRAENG-12018</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee">LaDarius Owens</span>
+        </div>
+        <div class="tb-summary">Coordinate and link Retail epics / workstreams into rebuild tracking (IA / LA / NH)</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-0</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">scope-tracking</span>
+          <span class="tb-type">Task</span>
+        </div>
+      </div>
+    </div><!-- /project-management group -->
+
+    <!-- ── Squad: [INFRAENG] DCOps ── -->
+    <div class="tb-group" data-group="dcops" data-squad="dcops">
+      <div class="tb-group-header">
+        <span class="tb-group-label">[INFRAENG] DCOps — Cluster Deployments</span>
+        <span class="tb-group-meta">4 epics &nbsp;·&nbsp; label: <code>rc-phase-1</code> &nbsp;·&nbsp; all In Progress</span>
+      </div>
+
+      <div class="tb-card" data-status="inprogress" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8135" target="_blank" class="tb-key">INFRAENG-8135</a>
+          <span class="tb-status-pill pill-inprogress">In Progress</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">IA01NX100-PE — Iowa Nutanix cluster deployment</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">iowa</span>
+          <span class="tb-label-chip">dcops</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="inprogress" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8150" target="_blank" class="tb-key">INFRAENG-8150</a>
+          <span class="tb-status-pill pill-inprogress">In Progress</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">LA01NX100-PE — Louisiana Nutanix cluster deployment</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">louisiana</span>
+          <span class="tb-label-chip">dcops</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="inprogress" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8142" target="_blank" class="tb-key">INFRAENG-8142</a>
+          <span class="tb-status-pill pill-inprogress">In Progress</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">NH01NX100-PE — New Hampshire Nutanix cluster deployment</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">new-hampshire</span>
+          <span class="tb-label-chip">dcops</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="inprogress" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8100" target="_blank" class="tb-key">INFRAENG-8100</a>
+          <span class="tb-status-pill pill-inprogress">In Progress</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">CT02NX100-PE — Foxwoods Nutanix cluster deployment</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">foxwoods</span>
+          <span class="tb-label-chip">dcops</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+    </div><!-- /dcops group -->
+
+    <!-- ── Squad: [INFRAENG] NetOps ── -->
+    <div class="tb-group" data-group="netops" data-squad="netops">
+      <div class="tb-group-header">
+        <span class="tb-group-label">[INFRAENG] NetOps — Network Rebuilds</span>
+        <span class="tb-group-meta">4 epics &nbsp;·&nbsp; label: <code>rc-phase-1</code> &nbsp;·&nbsp; all In Progress</span>
+      </div>
+
+      <div class="tb-card" data-status="inprogress" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8287" target="_blank" class="tb-key">INFRAENG-8287</a>
+          <span class="tb-status-pill pill-inprogress">In Progress</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Iowa DC network rebuild — NetOps</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">iowa</span>
+          <span class="tb-label-chip">netops</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="inprogress" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8311" target="_blank" class="tb-key">INFRAENG-8311</a>
+          <span class="tb-status-pill pill-inprogress">In Progress</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Louisiana DC network rebuild — NetOps</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">louisiana</span>
+          <span class="tb-label-chip">netops</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="inprogress" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-8299" target="_blank" class="tb-key">INFRAENG-8299</a>
+          <span class="tb-status-pill pill-inprogress">In Progress</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">New Hampshire DC network rebuild — NetOps</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">new-hampshire</span>
+          <span class="tb-label-chip">netops</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="inprogress" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-7543" target="_blank" class="tb-key">INFRAENG-7543</a>
+          <span class="tb-status-pill pill-inprogress">In Progress</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Foxwoods DC network rebuild — NetOps</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">foxwoods</span>
+          <span class="tb-label-chip">netops</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+    </div><!-- /netops group -->
+
+    <!-- ── Squad: [CoreInfra] Kilo ── -->
+    <div class="tb-group" data-group="kilo" data-squad="kilo">
+      <div class="tb-group-header">
+        <span class="tb-group-label">[CoreInfra] Kilo — Compute Rebuilds</span>
+        <span class="tb-group-meta">4 epics &nbsp;·&nbsp; label: <code>rc-phase-1</code> &nbsp;·&nbsp; all Backlog ⚠️</span>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9187" target="_blank" class="tb-key">INFRAENG-9187</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Iowa Kilo compute rebuild</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">iowa</span>
+          <span class="tb-label-chip">kilo</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9189" target="_blank" class="tb-key">INFRAENG-9189</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Louisiana Kilo compute rebuild</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">louisiana</span>
+          <span class="tb-label-chip">kilo</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9188" target="_blank" class="tb-key">INFRAENG-9188</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">New Hampshire Kilo compute rebuild</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">new-hampshire</span>
+          <span class="tb-label-chip">kilo</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase1">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-12638" target="_blank" class="tb-key">INFRAENG-12638</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Foxwoods Kilo compute rebuild</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-1</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">foxwoods</span>
+          <span class="tb-label-chip">kilo</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+    </div><!-- /kilo group -->
+
+    <!-- ── Squad: [DBOps] DBA ── -->
+    <div class="tb-group" data-group="dba" data-squad="dba">
+      <div class="tb-group-header">
+        <span class="tb-group-label">[DBOps] DBA — Database Infrastructure</span>
+        <span class="tb-group-meta">4 epics &nbsp;·&nbsp; label: <code>rc-phase-2</code> &nbsp;·&nbsp; all Backlog ⚠️</span>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase2">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-9091" target="_blank" class="tb-key">INFRAENG-9091</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Iowa DBI rebuild — Database Infrastructure</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-2</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">iowa</span>
+          <span class="tb-label-chip">dbi</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase2">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-10082" target="_blank" class="tb-key">INFRAENG-10082</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Louisiana DBI rebuild — Database Infrastructure</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-2</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">louisiana</span>
+          <span class="tb-label-chip">dbi</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase2">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-10081" target="_blank" class="tb-key">INFRAENG-10081</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">New Hampshire DBI rebuild — Database Infrastructure</div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-2</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">new-hampshire</span>
+          <span class="tb-label-chip">dbi</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+
+      <div class="tb-card" data-status="backlog" data-assignee="unassigned" data-phase="phase2">
+        <div class="tb-card-top">
+          <a href="https://draftkingsofficial.atlassian.net/browse/INFRAENG-1213" target="_blank" class="tb-key">INFRAENG-1213</a>
+          <span class="tb-status-pill pill-open">Backlog</span>
+          <span class="tb-assignee tb-unassigned">⚠️ Unassigned</span>
+        </div>
+        <div class="tb-summary">Foxwoods DBI rebuild — Database Infrastructure <span style="color:var(--dk-warning);font-size:11px;margin-left:6px;">due Jun 21</span></div>
+        <div class="tb-meta-row">
+          <span class="tb-label-chip">rc-phase-2</span>
+          <span class="tb-label-chip">retail-consolidation</span>
+          <span class="tb-label-chip">foxwoods</span>
+          <span class="tb-label-chip">dbi</span>
+          <span class="tb-type">Epic</span>
+        </div>
+      </div>
+    </div><!-- /dba group -->
+
+    <div class="tb-empty-state" id="tbEmptyState" style="display:none;">
+      <span style="font-size:24px;">🎯</span>
+      <div style="margin-top:8px;font-weight:600;color:#fff;">No tickets match this filter</div>
+      <div style="font-size:12px;color:var(--dk-muted);margin-top:4px;">Try a different filter or <a href="https://draftkingsofficial.atlassian.net/issues/?jql=project%3DINFRAENG%20AND%20labels%3Dretail-consolidation" target="_blank" style="color:var(--dk-accent);">view all in Jira ↗</a></div>
+    </div>
+
+    <p style="font-size:12px;color:var(--dk-muted);margin-top:12px;">All epics carry <code>retail-consolidation</code> + phase label. Filter by phase using the Phase 1 / Phase 2 buttons above.</p>
+  </section>
+
+</main>
+
+<!-- ── Timeline Modal ── -->
+<div class="tl-overlay" id="tlOverlay" onclick="handleOverlayClick(event)">
+  <div class="tl-modal">
+    <div class="tl-modal-header">
+      <h3>Project Timeline — IA / LA / NH Rebuilds</h3>
+      <button class="tl-close" onclick="closeTimeline()">✕</button>
+    </div>
+    <div class="tl-modal-body">
+
+      <div class="tl-legend">
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:var(--dk-muted);border:2px solid var(--dk-muted)"></div> Not started</div>
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:var(--dk-blue)"></div> In progress</div>
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:var(--dk-green)"></div> Complete</div>
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:var(--dk-red)"></div> Blocked</div>
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:var(--dk-orange)"></div> Critical path</div>
+      </div>
+
+      <div class="tl-track">
+
+        <!-- MAY 2026 -->
+        <div class="tl-month-label">May 2026 — Pre-Kickoff</div>
+
+        <div class="tl-item status-active">
+          <div class="tl-row" onclick="closeTimelineGoTo('charter')">
+            <span class="tl-phase-tag">Phase 0</span>
+            <div class="tl-milestone">Project Kickoff<div class="tl-sub">Scope, RAID log, team alignment, tracking setup</div></div>
+            <span class="tl-owner">Saydu Paye</span>
+            <span class="tl-status-pill pill-active">In Progress</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-active">
+          <div class="tl-row" onclick="closeTimelineGoTo('tickets')">
+            <span class="tl-phase-tag">Phase 0</span>
+            <div class="tl-milestone">Regulatory Engagement Initiated<div class="tl-sub">IA / LA / NH + Foxwoods tribal — INFRAENG-12017</div></div>
+            <span class="tl-owner">Saydu Paye</span>
+            <span class="tl-status-pill pill-critical">Critical</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-active">
+          <div class="tl-row" onclick="closeTimelineGoTo('tickets')">
+            <span class="tl-phase-tag">Phase 0</span>
+            <div class="tl-milestone">Compliance Docs Updated &amp; Distributed<div class="tl-sub">NJ/MI base → IA/LA/NH — INFRAENG-12016</div></div>
+            <span class="tl-owner">Mike Emler</span>
+            <span class="tl-status-pill pill-active">In Progress</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-active">
+          <div class="tl-row" onclick="closeTimelineGoTo('tickets')">
+            <span class="tl-phase-tag">Phase 0</span>
+            <div class="tl-milestone">Retail Epics Linked to Rebuild Tracking<div class="tl-sub">RE scope + capacity confirmed — INFRAENG-12018</div></div>
+            <span class="tl-owner">LaDarius Owens</span>
+            <span class="tl-status-pill pill-active">In Progress</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('tickets')">
+            <span class="tl-phase-tag">Phase 0</span>
+            <div class="tl-milestone">Cutover Sequencing Confirmed<div class="tl-sub">IA → LA → NH order locked — INFRAENG-12015</div></div>
+            <span class="tl-owner">Infra Leadership</span>
+            <span class="tl-status-pill pill-open">Open</span>
+          </div>
+        </div>
+
+        <!-- JUNE 2026 -->
+        <div class="tl-month-label">June 2026 — Infrastructure Execution</div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase1')">
+            <span class="tl-phase-tag">Phase 1</span>
+            <div class="tl-milestone">DC Ops + Net Ops Readiness<div class="tl-sub">Capacity confirmed, network validated per jurisdiction</div></div>
+            <span class="tl-owner">DC Ops / Net Ops</span>
+            <span class="tl-status-pill pill-open">Open</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase2')">
+            <span class="tl-phase-tag">Phase 2</span>
+            <div class="tl-milestone">Core Infra + DB Ops Provisioning<div class="tl-sub">Compute provisioned, DB + SYSDBA migration plan ready</div></div>
+            <span class="tl-owner">Core Infra / DB Ops</span>
+            <span class="tl-status-pill pill-open">Open</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase3')">
+            <span class="tl-phase-tag">Phase 3</span>
+            <div class="tl-milestone">PaaS Platform Setup<div class="tl-sub">Kafka, Vault, k8s deployed; endpoint changes logged</div></div>
+            <span class="tl-owner">PaaS</span>
+            <span class="tl-status-pill pill-open">Open</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase4')">
+            <span class="tl-phase-tag">Phase 4</span>
+            <div class="tl-milestone">BI Validation<div class="tl-sub">Reporting pipelines validated in non-prod</div></div>
+            <span class="tl-owner">BI</span>
+            <span class="tl-status-pill pill-open">Open</span>
+          </div>
+        </div>
+
+        <!-- JULY 2026 -->
+        <div class="tl-month-label">July 2026 — Testing &amp; Release Readiness</div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase5')">
+            <span class="tl-phase-tag">Phase 5</span>
+            <div class="tl-milestone">Retail Engineering Testing Complete<div class="tl-sub">All 3 jurisdictions tested; critical flows validated</div></div>
+            <span class="tl-owner">Retail Eng</span>
+            <span class="tl-status-pill pill-critical">Critical Path</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase6')">
+            <span class="tl-phase-tag">Phase 6</span>
+            <div class="tl-milestone">Release Management Readiness<div class="tl-sub">RCM approved, CAB + regulatory sign-offs per jurisdiction</div></div>
+            <span class="tl-owner">You / RM</span>
+            <span class="tl-status-pill pill-critical">Critical Path</span>
+          </div>
+        </div>
+
+        <!-- CUTOVER -->
+        <div class="tl-month-label">Cutover Window — TBD</div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase7')">
+            <span class="tl-phase-tag">Phase 7</span>
+            <div class="tl-milestone">Cutover Execution<div class="tl-sub">Maintenance window — Go/No-Go gate — 17-step run-of-show</div></div>
+            <span class="tl-owner">All teams</span>
+            <span class="tl-status-pill pill-critical">Critical Path</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase8')">
+            <span class="tl-phase-tag">Phase 8</span>
+            <div class="tl-milestone">Post-Cutover Validation<div class="tl-sub">All 10 validation items confirmed per jurisdiction</div></div>
+            <span class="tl-owner">All teams</span>
+            <span class="tl-status-pill pill-open">Open</span>
+          </div>
+        </div>
+
+        <!-- POST CUTOVER -->
+        <div class="tl-month-label">Post-Cutover</div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase9')">
+            <span class="tl-phase-tag">Phase 9</span>
+            <div class="tl-milestone">SFTP &amp; Follow-up Work<div class="tl-sub">Separate workstream — does not block Day 1</div></div>
+            <span class="tl-owner">TBD</span>
+            <span class="tl-status-pill pill-open">Open</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase10')">
+            <span class="tl-phase-tag">Phase 10</span>
+            <div class="tl-milestone">Decommissioning<div class="tl-sub">Legacy hardware released; architecture diagrams updated</div></div>
+            <span class="tl-owner">DC Ops / Infra</span>
+            <span class="tl-status-pill pill-open">Open</span>
+          </div>
+        </div>
+
+        <div class="tl-item status-open">
+          <div class="tl-row" onclick="closeTimelineGoTo('phase11')">
+            <span class="tl-phase-tag">Phase 11</span>
+            <div class="tl-milestone">Closure &amp; Retrospective<div class="tl-sub">Stabilization confirmed; lessons learned back to Confluence</div></div>
+            <span class="tl-owner">Saydu Paye</span>
+            <span class="tl-status-pill pill-open">Open</span>
+          </div>
+        </div>
+
+      </div><!-- /tl-track -->
+
+      <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--dk-border); font-size:11px; color:var(--dk-muted);">
+        Click any row to jump to that phase in the playbook. Statuses update manually — check off items in each phase to track progress.
+      </div>
+
+    </div><!-- /tl-modal-body -->
+  </div><!-- /tl-modal -->
+</div><!-- /tl-overlay -->
+
+<script>
+  function togglePhase(header) {
+    header.parentElement.classList.toggle('open');
+  }
+
+  /* ── Ticket board filter ── */
+  function filterTickets(filter, btn) {
+    document.querySelectorAll('.tb-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const cards = document.querySelectorAll('.tb-card');
+    let visible = 0;
+
+    cards.forEach(card => {
+      let show = false;
+      if (filter === 'all') {
+        show = true;
+      } else if (filter === 'backlog') {
+        show = card.dataset.status === 'backlog';
+      } else if (filter === 'inprogress') {
+        show = card.dataset.status === 'inprogress';
+      } else if (filter === 'done') {
+        show = card.dataset.status === 'done';
+      } else if (filter === 'unassigned') {
+        show = card.dataset.assignee === 'unassigned';
+      } else if (filter === 'phase1') {
+        show = card.dataset.phase === 'phase1';
+      } else if (filter === 'phase2') {
+        show = card.dataset.phase === 'phase2';
+      }
+      card.classList.toggle('tb-hidden', !show);
+      if (show) visible++;
+    });
+
+    document.getElementById('tbEmptyState').style.display = visible === 0 ? 'block' : 'none';
+
+    // also hide group headers with no visible cards
+    document.querySelectorAll('.tb-group').forEach(group => {
+      const anyVisible = [...group.querySelectorAll('.tb-card')].some(c => !c.classList.contains('tb-hidden'));
+      group.style.display = anyVisible ? '' : 'none';
+    });
+  }
+
+  function markDone(checkbox) {
+    checkbox.closest('li').classList.toggle('checked', checkbox.checked);
+  }
+
+  function openTimeline() {
+    document.getElementById('tlOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeTimeline() {
+    document.getElementById('tlOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeTimelineGoTo(sectionId) {
+    closeTimeline();
+    setTimeout(() => {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Auto-open phase card if it's a phase
+        if (el.classList.contains('phase-card') && !el.classList.contains('open')) {
+          el.classList.add('open');
+        }
+      }
+    }, 120);
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('tlOverlay')) closeTimeline();
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeTimeline();
+  });
+
+  // Persist checkbox state in localStorage
+  document.addEventListener('DOMContentLoaded', () => {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((cb, i) => {
+      const key = `rc-playbook-cb-${i}`;
+      cb.checked = localStorage.getItem(key) === '1';
+      if (cb.checked) cb.closest('li')?.classList.add('checked');
+      cb.addEventListener('change', () => {
+        localStorage.setItem(key, cb.checked ? '1' : '0');
+      });
+    });
+  });
+</script>
+</body>
+</html>
