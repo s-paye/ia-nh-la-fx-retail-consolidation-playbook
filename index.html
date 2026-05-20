@@ -156,7 +156,6 @@
     white-space: nowrap;
     transition: all 0.15s;
     flex-shrink: 0;
-    margin-top: 4px;
   }
 
   .timeline-btn:hover {
@@ -166,6 +165,196 @@
   }
 
   .timeline-btn svg { flex-shrink: 0; }
+
+  /* ── Header button group ── */
+  .header-btn-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  /* ── Progress Status button ── */
+  .progress-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    background: rgba(26,156,62,0.12);
+    border: 1px solid rgba(26,156,62,0.35);
+    border-radius: var(--radius);
+    color: var(--dk-green);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .progress-btn:hover {
+    background: rgba(26,156,62,0.22);
+    border-color: var(--dk-green);
+    color: #fff;
+  }
+  .progress-btn svg { flex-shrink: 0; }
+
+  /* ── Progress Status modal ── */
+  .ps-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+    align-items: center;
+    justify-content: center;
+  }
+  .ps-overlay.open { display: flex; }
+  .ps-modal {
+    background: var(--dk-card);
+    border: 1px solid var(--dk-border);
+    border-radius: 14px;
+    width: min(600px, 94vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  }
+  .ps-close {
+    position: absolute;
+    top: 16px; right: 18px;
+    background: none;
+    border: none;
+    color: var(--dk-muted);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color .15s;
+  }
+  .ps-close:hover { color: #fff; }
+  .ps-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .ps-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+  .ps-updated {
+    font-size: 10px;
+    color: var(--dk-muted);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  /* Overall health badge */
+  .ps-health {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+  }
+  .ps-health.amber {
+    background: rgba(244,131,61,0.1);
+    border-color: rgba(244,131,61,0.3);
+  }
+  .ps-health.red {
+    background: rgba(230,57,70,0.1);
+    border-color: rgba(230,57,70,0.3);
+  }
+  .ps-health.green {
+    background: rgba(26,156,62,0.1);
+    border-color: rgba(26,156,62,0.3);
+  }
+  .ps-health-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .amber .ps-health-dot { background: var(--dk-orange); box-shadow: 0 0 8px var(--dk-orange); }
+  .red   .ps-health-dot { background: var(--dk-red);    box-shadow: 0 0 8px var(--dk-red); }
+  .green .ps-health-dot { background: var(--dk-green);  box-shadow: 0 0 8px var(--dk-green); }
+  .ps-health-text { font-size: 13px; font-weight: 700; color: #fff; }
+  .ps-health-sub  { font-size: 11px; color: var(--dk-muted); margin-top: 1px; }
+  /* Section */
+  .ps-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--dk-muted);
+    margin: 16px 0 8px;
+  }
+  /* Phase rows */
+  .ps-phase-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px;
+  }
+  .ps-phase-row:last-child { border-bottom: none; }
+  .ps-phase-name { flex: 1; color: var(--dk-text); }
+  .ps-phase-name span { display: block; font-size: 10px; color: var(--dk-muted); }
+  .ps-phase-pill {
+    padding: 2px 9px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .ps-pill-done       { background:rgba(26,156,62,.18);   color:var(--dk-green); }
+  .ps-pill-inprogress { background:rgba(74,158,255,.18);  color:var(--dk-blue); }
+  .ps-pill-backlog    { background:rgba(138,155,176,.15); color:var(--dk-muted); }
+  .ps-pill-blocked    { background:rgba(230,57,70,.18);   color:var(--dk-red); }
+  .ps-pill-risk       { background:rgba(244,131,61,.18);  color:var(--dk-orange); }
+  /* Progress bar */
+  .ps-prog-track {
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    width: 60px;
+    flex-shrink: 0;
+  }
+  .ps-prog-fill { height: 100%; border-radius: 2px; }
+  /* Blocker list */
+  .ps-blocker {
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(230,57,70,0.07);
+    border: 1px solid rgba(230,57,70,0.2);
+    border-radius: 7px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: var(--dk-text);
+    align-items: flex-start;
+  }
+  .ps-blocker-icon { color: var(--dk-red); flex-shrink: 0; margin-top: 1px; }
+  .ps-divider { border: none; border-top: 1px solid var(--dk-border); margin: 18px 0 0; }
+  .ps-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--dk-muted);
+  }
+  .ps-footer a { color: var(--dk-accent); text-decoration: none; }
+  .ps-footer a:hover { text-decoration: underline; }
 
   /* ── Timeline modal ── */
   .tl-overlay {
@@ -1368,15 +1557,26 @@
     </div>
     <div class="header-top">
       <h1>Retail Consolidation Playbook</h1>
-      <button class="timeline-btn" onclick="openTimeline()">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="1" y="3" width="14" height="2" rx="1" fill="currentColor" opacity="0.4"/>
-          <rect x="1" y="7" width="9" height="2" rx="1" fill="currentColor" opacity="0.7"/>
-          <rect x="1" y="11" width="12" height="2" rx="1" fill="currentColor"/>
-          <circle cx="13" cy="8" r="2.5" fill="currentColor"/>
-        </svg>
-        View Timeline
-      </button>
+      <div class="header-btn-group">
+        <button class="progress-btn" onclick="openProgressStatus()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+            <path d="M8 8 L8 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            <path d="M8 8 L12 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+          </svg>
+          Progress Status
+        </button>
+        <button class="timeline-btn" onclick="openTimeline()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="3" width="14" height="2" rx="1" fill="currentColor" opacity="0.4"/>
+            <rect x="1" y="7" width="9" height="2" rx="1" fill="currentColor" opacity="0.7"/>
+            <rect x="1" y="11" width="12" height="2" rx="1" fill="currentColor"/>
+            <circle cx="13" cy="8" r="2.5" fill="currentColor"/>
+          </svg>
+          View Timeline
+        </button>
+      </div>
     </div>
     <p class="subtitle">DC Rebuild + Retail Consolidation &nbsp;|&nbsp; Lead: Saydu Paye &nbsp;|&nbsp; Infra start: June 2026</p>
     <div class="role-callout">
@@ -2893,6 +3093,20 @@
     checkbox.closest('li').classList.toggle('checked', checkbox.checked);
   }
 
+  function openProgressStatus() {
+    document.getElementById('psOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeProgressStatus() {
+    document.getElementById('psOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handlePsOverlayClick(e) {
+    if (e.target === document.getElementById('psOverlay')) closeProgressStatus();
+  }
+
   function openTimeline() {
     document.getElementById('tlOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -2922,7 +3136,7 @@
   }
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeTimeline();
+    if (e.key === 'Escape') { closeTimeline(); closeProgressStatus(); }
   });
 
   // Persist checkbox state in localStorage
@@ -2938,6 +3152,124 @@
     });
   });
 </script>
+
+<!-- ── Progress Status Modal ── -->
+<div class="ps-overlay" id="psOverlay" onclick="handlePsOverlayClick(event)">
+  <div class="ps-modal" id="psModal">
+    <button class="ps-close" onclick="closeProgressStatus()" title="Close">✕</button>
+
+    <div class="ps-header">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="8" r="6.5" stroke="#28a745" stroke-width="1.5" opacity="0.5"/>
+        <path d="M8 8 L8 2.5" stroke="#28a745" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+        <path d="M8 8 L12 10" stroke="#28a745" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="8" cy="8" r="1.5" fill="#28a745"/>
+      </svg>
+      <h3>Project Progress Status</h3>
+      <span class="ps-updated">As of May 20, 2026</span>
+    </div>
+
+    <!-- Overall health -->
+    <div class="ps-health amber">
+      <div class="ps-health-dot"></div>
+      <div>
+        <div class="ps-health-text">🟡 At Risk — Infra blockers unresolved</div>
+        <div class="ps-health-sub">Phase 1 Kilo + DBI epics not started · IA + NH sagas past due · Cutover date TBD</div>
+      </div>
+    </div>
+
+    <!-- Phase status -->
+    <div class="ps-section-label">Phase Status</div>
+
+    <div class="ps-phase-row">
+      <div class="ps-phase-name">Phase 0 — Kickoff<span>All jurisdictions</span></div>
+      <div class="ps-prog-track"><div class="ps-prog-fill" style="width:60%;background:var(--dk-blue);"></div></div>
+      <span class="ps-phase-pill ps-pill-inprogress">In Progress</span>
+    </div>
+    <div class="ps-phase-row">
+      <div class="ps-phase-name">Phase 1 — Infrastructure<span>DCOps + NetOps in flight · Kilo + DBI not started</span></div>
+      <div class="ps-prog-track"><div class="ps-prog-fill" style="width:40%;background:var(--dk-orange);"></div></div>
+      <span class="ps-phase-pill ps-pill-risk">At Risk</span>
+    </div>
+    <div class="ps-phase-row">
+      <div class="ps-phase-name">Phase 2 — DB + Core Infra<span>Blocked on Phase 1 DBI completion</span></div>
+      <div class="ps-prog-track"><div class="ps-prog-fill" style="width:0%;background:var(--dk-muted);"></div></div>
+      <span class="ps-phase-pill ps-pill-backlog">Not Started</span>
+    </div>
+    <div class="ps-phase-row">
+      <div class="ps-phase-name">Phase 3 — PaaS Setup<span>Kafka, Vault, Kubernetes</span></div>
+      <div class="ps-prog-track"><div class="ps-prog-fill" style="width:0%;background:var(--dk-muted);"></div></div>
+      <span class="ps-phase-pill ps-pill-backlog">Not Started</span>
+    </div>
+    <div class="ps-phase-row">
+      <div class="ps-phase-name">Phase 4 — BI Validation</div>
+      <div class="ps-prog-track"><div class="ps-prog-fill" style="width:0%;background:var(--dk-muted);"></div></div>
+      <span class="ps-phase-pill ps-pill-backlog">Not Started</span>
+    </div>
+    <div class="ps-phase-row">
+      <div class="ps-phase-name">Phase 5 — Retail Eng Dev<span>Critical path — watch closely</span></div>
+      <div class="ps-prog-track"><div class="ps-prog-fill" style="width:0%;background:var(--dk-muted);"></div></div>
+      <span class="ps-phase-pill ps-pill-backlog">Not Started</span>
+    </div>
+    <div class="ps-phase-row">
+      <div class="ps-phase-name">Phase 6 — Release Mgmt</div>
+      <div class="ps-prog-track"><div class="ps-prog-fill" style="width:0%;background:var(--dk-muted);"></div></div>
+      <span class="ps-phase-pill ps-pill-backlog">Not Started</span>
+    </div>
+    <div class="ps-phase-row">
+      <div class="ps-phase-name">Phase 7 — Cutover<span>IA → LA → NH sequence</span></div>
+      <div class="ps-prog-track"><div class="ps-prog-fill" style="width:0%;background:var(--dk-muted);"></div></div>
+      <span class="ps-phase-pill ps-pill-backlog">Not Started</span>
+    </div>
+    <div class="ps-phase-row">
+      <div class="ps-phase-name">Foxwoods — Parallel Track<span>DBI due Jun 21 ⚠️</span></div>
+      <div class="ps-prog-track"><div class="ps-prog-fill" style="width:20%;background:var(--dk-red);"></div></div>
+      <span class="ps-phase-pill ps-pill-risk">At Risk</span>
+    </div>
+
+    <!-- Epic counts -->
+    <div class="ps-section-label">Epic Health</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;">
+      <div style="background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.2);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:20px;font-weight:700;color:var(--dk-blue);">8</div>
+        <div style="font-size:10px;color:var(--dk-muted);margin-top:2px;">In Progress</div>
+      </div>
+      <div style="background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:20px;font-weight:700;color:var(--dk-red);">8</div>
+        <div style="font-size:10px;color:var(--dk-muted);margin-top:2px;">Backlog ⚠️</div>
+      </div>
+      <div style="background:rgba(26,156,62,0.08);border:1px solid rgba(26,156,62,0.2);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:20px;font-weight:700;color:var(--dk-green);">0</div>
+        <div style="font-size:10px;color:var(--dk-muted);margin-top:2px;">Done</div>
+      </div>
+    </div>
+
+    <!-- Active blockers -->
+    <div class="ps-section-label">Active Blockers</div>
+    <div class="ps-blocker">
+      <span class="ps-blocker-icon">⛔</span>
+      <div><strong>IA + NH infra sagas past due</strong> — INFRAENG-6912 (IA), INFRAENG-6909 (NH). Revised completion dates needed from Eric Beisecker.</div>
+    </div>
+    <div class="ps-blocker">
+      <span class="ps-blocker-icon">⛔</span>
+      <div><strong>6 Backlog epics not started</strong> — Kilo + DBI for IA, LA, NH (INFRAENG-9187, 9188, 9189, 9091, 10081, 10082). Must start before Phase 2.</div>
+    </div>
+    <div class="ps-blocker">
+      <span class="ps-blocker-icon">⚠️</span>
+      <div><strong>Foxwoods DBI due Jun 21</strong> — INFRAENG-1213 still in Backlog. 32 days remaining.</div>
+    </div>
+    <div class="ps-blocker">
+      <span class="ps-blocker-icon">⚠️</span>
+      <div><strong>IPS-424 (NH)</strong> — NH retail workload migration initiative still in Discovery. Blocks NH RE testing.</div>
+    </div>
+
+    <hr class="ps-divider">
+    <div class="ps-footer">
+      <span>Source of truth: <a href="https://draftkingsofficial.atlassian.net" target="_blank">Jira ↗</a></span>
+      <span><a href="#raid" onclick="closeProgressStatus()">View full RAID log →</a></span>
+    </div>
+  </div>
+</div>
 
 <!-- ── Collapsible sections + deep-link ── -->
 <div id="linkToast">🔗 Link copied to clipboard</div>
